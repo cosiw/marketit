@@ -4,10 +4,12 @@ import com.MarketIt.order.order.dto.OrderRequestDTO;
 import com.MarketIt.order.order.dto.OrderResponseDTO;
 import com.MarketIt.order.order.service.OrderService;
 import io.swagger.models.Response;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +29,11 @@ public class OrderController {
         this.orderService = orderService;
     }
     @PostMapping(value="")
-    public ResponseEntity createOrder(@RequestBody OrderRequestDTO req){
+    public ResponseEntity createOrder(@RequestBody @Valid OrderRequestDTO req, BindingResult bindingResult){
+
+        if(bindingResult.hasErrors()){
+            return new ResponseEntity(bindingResult.getFieldError().getDefaultMessage(), HttpStatus.BAD_REQUEST);
+        }
         OrderResponseDTO res = orderService.createOrder(req);
 
         return new ResponseEntity(res, HttpStatus.OK);

@@ -1,10 +1,12 @@
 package com.MarketIt.order.order.service;
 
+import com.MarketIt.order.common.Exception.CustomException;
 import com.MarketIt.order.order.dto.OrderRequestDTO;
 import com.MarketIt.order.order.dto.OrderResponseDTO;
 import com.MarketIt.order.order.entity.Order;
 import com.MarketIt.order.order.repository.OrderRepository;
 import java.util.Optional;
+import javax.servlet.http.HttpServletResponse;
 import javax.swing.text.html.Option;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +43,13 @@ public class OrderServiceImpl implements OrderService{
     public OrderResponseDTO completeOrder(Long completeUser, Long orderIdx) {
         Optional<Order> findOrder = orderRepository.findById(orderIdx);
         if(findOrder.isEmpty()){
-            return null;
+           throw new CustomException("주문이 존재하지 않습니다.", HttpServletResponse.SC_BAD_REQUEST);
         }
+
         Order order = findOrder.get();
+        if(order.getStatus().equals("C")){
+            throw new CustomException("이미 완료 상태입니다.", HttpServletResponse.SC_BAD_REQUEST);
+        }
         order.completeOrder(completeUser);
 
         OrderResponseDTO res = new OrderResponseDTO(order);
@@ -57,7 +63,7 @@ public class OrderServiceImpl implements OrderService{
     public OrderResponseDTO getOrder(Long orderIdx) {
         Optional<Order> findOrder = orderRepository.findById(orderIdx);
         if(findOrder.isEmpty()){
-            return null;
+            throw new CustomException("주문이 존재하지 않습니다.", HttpServletResponse.SC_BAD_REQUEST);
         }
         Order order = findOrder.get();
 
@@ -74,7 +80,7 @@ public class OrderServiceImpl implements OrderService{
         Page<Order> findList = orderRepository.findAll(pageable);
 
         if(findList.isEmpty()){
-            return null;
+            throw new CustomException("주문이 존재하지 않습니다.", HttpServletResponse.SC_BAD_REQUEST);
         }
 
         Page<OrderResponseDTO> res = findList.map(o -> new OrderResponseDTO(o));
