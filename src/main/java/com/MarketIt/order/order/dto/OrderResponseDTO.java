@@ -3,10 +3,12 @@ package com.MarketIt.order.order.dto;
 import com.MarketIt.order.order.entity.Order;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class OrderResponseDTO {
     private Long orderIdx;
     private String itemName;
